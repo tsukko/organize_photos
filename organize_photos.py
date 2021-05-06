@@ -13,6 +13,7 @@ input_pdf_dir = "input"
 
 def exchange_pdf_to_image(file_name):
     """
+    ファイル名の変更
 
     :param file_name:
     :return:
@@ -31,7 +32,7 @@ def exchange_pdf_to_image(file_name):
     # 保存用パスの設定とフォルダ生成
     file_directory = file_date.strftime("%Y%m")
     save_path = os.path.abspath(output_image_dir) + "/" + file_directory
-    output_setting(save_path)
+    os.makedirs(save_path, exist_ok=True)
 
     # 保存ファイル名の設定
     new_file_name = file_date.strftime("%Y%m%d_%H%M%S")
@@ -47,7 +48,8 @@ def exchange_pdf_to_image(file_name):
         new_file_path = new_file_path_base + "_m" + str(num) + file_ext
         # print("2: ", new_file_path)
 
-    shutil.copyfile(file_name, new_file_path)
+    new_path1 = shutil.copyfile(file_name, new_file_path)
+    new_path2 = shutil.move(file_name, new_file_path)
 
     print(file_name, new_file_name, ", file_date:", file_date, ", 作成日時：", cd, ", 更新日時：", md)
 
@@ -55,8 +57,8 @@ def exchange_pdf_to_image(file_name):
 def get_exif_of_image(file):
     """
     Get EXIF of an image if exists.
+    指定した画像のEXIFデータを取り出す
 
-    指定した画像のEXIFデータを取り出す関数
     :param file: ファイル名（パス含む）
     :return: exif_table Exif データを格納した辞書
     """
@@ -91,8 +93,6 @@ def get_date(file_name) -> datetime:
     exif = get_exif_of_image(file_name)
     if "DateTimeOriginal" in exif:
         # strftime() で新しい名前のフォーマットを指定
-        # new_name = Path(filename).with_name(datetime.datetime.strptime(exif["DateTimeOriginal"], "%Y:%m:%d %H:%M:%S").strftime("IMG_%Y%m%d_%H%M%S.JPG"))
-        # filename.rename(new_name)
         # print("debug, a:", exif["Date\\\\\\TimeOriginal"])
         return datetime.datetime.strptime(exif["DateTimeOriginal"], "%Y:%m:%d %H:%M:%S")
     else:
@@ -104,16 +104,8 @@ def get_date(file_name) -> datetime:
         return datetime.datetime.fromtimestamp(min(ct, mt))
 
 
-def output_setting(file_directory):
-    """
-    結果の出力用ディレクトリが存在しなければ、生成する
-    """
-    if not os.path.exists(file_directory):
-        os.makedirs(file_directory)
-
-
 def run():
-    output_setting(output_image_dir)
+    os.makedirs(output_image_dir, exist_ok=True)
     # jpg_list = [p for p in glob.glob(input_pdf_dir + "/**", recursive=True) if re.search('/*\.(jpg|JPG|jpeg|png|gif|bmp)', str(p))]
     jpg_list = glob.glob(os.path.abspath(input_pdf_dir) + "/**/*.*", recursive=True)
     for file_name in jpg_list:
