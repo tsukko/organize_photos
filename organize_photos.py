@@ -1,12 +1,11 @@
 import datetime
 import glob
 import os
-
-# use Windows
 import shutil
 from PIL import Image, UnidentifiedImageError
 from PIL.ExifTags import TAGS
 
+# use Windows
 output_image_dir = "intermediate_img"
 input_pdf_dir = "input"
 
@@ -15,8 +14,8 @@ def exchange_pdf_to_image(file_name):
     """
     ファイル名の変更
 
-    :param file_name:
-    :return:
+    :param file_name: ファイル名（パス含む）
+    :return: 変換後のファイル名
     """
     # debug
     # 作成日時
@@ -48,10 +47,11 @@ def exchange_pdf_to_image(file_name):
         new_file_path = new_file_path_base + "_m" + str(num) + file_ext
         # print("2: ", new_file_path)
 
-    new_path1 = shutil.copyfile(file_name, new_file_path)
-    new_path2 = shutil.move(file_name, new_file_path)
+    # new_path = shutil.copyfile(file_name, new_file_path)
+    new_path = shutil.move(file_name, new_file_path)
 
     print(file_name, new_file_name, ", file_date:", file_date, ", 作成日時：", cd, ", 更新日時：", md)
+    return new_path
 
 
 def get_exif_of_image(file):
