@@ -3,8 +3,6 @@ import glob
 import os
 
 # use Windows
-import pathlib
-import re
 import shutil
 from PIL import Image, UnidentifiedImageError
 from PIL.ExifTags import TAGS
@@ -41,7 +39,7 @@ def exchange_pdf_to_image(file_name):
     num = 0
     while os.path.exists(new_file_path):
         num += 1
-        new_file_path = new_file_path_base + "_" + str(num) + file_ext
+        new_file_path = new_file_path_base + "_m" + str(num) + file_ext
         # print("2: ", new_file_path)
 
     shutil.copyfile(file_name, new_file_path)
