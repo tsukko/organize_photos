@@ -1,6 +1,7 @@
 import datetime
 import glob
 import os
+import platform
 import shutil
 from PIL import Image, UnidentifiedImageError
 from PIL.ExifTags import TAGS
@@ -102,7 +103,15 @@ def get_date(file_path):
         return datetime.datetime.strptime(exif["DateTimeOriginal"], "%Y:%m:%d %H:%M:%S")
     else:
         # 作成日時
-        ct = os.path.getctime(file_path)
+        if platform.system() == 'Windows':
+            ct = os.path.getctime(file_path)
+        else:
+            stat = os.stat(file_path)
+            try:
+                ct = stat.st_birthtime
+            except AttributeError:
+                ct = stat.st_mtime
+                print("debug, c: ", ct)
         # 更新日時
         mt = os.path.getmtime(file_path)
         print("debug, b: ", datetime.datetime.fromtimestamp(min(ct, mt)))
