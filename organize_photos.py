@@ -1,6 +1,7 @@
-import datetime
 import glob
 import os
+import shutil
+
 from date_operation import get_date
 
 # use Windows
@@ -28,17 +29,15 @@ def exchange_pdf_to_image(file_path):
     file_ext = os.path.splitext(file_path)[1]
     new_file_path_base = save_path + "/IMG_" + new_file_name
     new_file_path = new_file_path_base + file_ext
-    # print("1: ", new_file_path)
 
     # もし、同時刻のファイルが存在する場合、ファイル名に"_m[enum]"を追加する
     num = 0
     while os.path.exists(new_file_path):
         num += 1
         new_file_path = new_file_path_base + "_m" + str(num) + file_ext
-        # print("2: ", new_file_path)
 
-    new_path = file_path
-    # new_path = shutil.copyfile(file_path, new_file_path)
+    # new_path = new_file_path
+    new_path = shutil.copyfile(file_path, new_file_path)
     # new_path = shutil.move(file_path, new_file_path)
 
     print("old: {0}, new: {1}".format(file_path, new_path))
