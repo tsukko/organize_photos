@@ -30,24 +30,27 @@ def exchange_pdf_to_image(file_path):
     new_file_path_base = save_path + "/IMG_" + new_file_name
     new_file_path = new_file_path_base + file_ext
 
-    # もし、同時刻のファイルが存在する場合、ファイル名に"_m[enum]"を追加する
+    # もし、同時刻のファイルが存在し、かつ、同じファイルサイズ出ない場合、ファイル名に"_m[enum]"を追加する
     num = 0
-    while os.path.exists(new_file_path):
+    file_size = os.path.getsize(file_path)
+    while os.path.exists(new_file_path) and os.path.getsize(new_file_path) != file_size:
+        print("debug: ", file_path)
+        print("debug: ", file_size, os.path.getsize(new_file_path))
         num += 1
         new_file_path = new_file_path_base + "_m" + str(num) + file_ext
 
-    # new_path = new_file_path
-    new_path = shutil.copyfile(file_path, new_file_path)
-    # new_path = shutil.move(file_path, new_file_path)
+    response_path = new_file_path
+    # response_path = shutil.copyfile(file_path, new_file_path)
+    # response_path = shutil.move(file_path, new_file_path)
 
-    print("old: {0}, new: {1}".format(file_path, new_path))
-    return new_path
+    # print("old: {0}, new: {1}".format(file_path, response_path))
+    return response_path
 
 
 def run():
     os.makedirs(output_image_dir, exist_ok=True)
-    # file_list = [p for p in glob.glob(input_pdf_dir + "/**", recursive=True) if re.search('/*\.(jpg|JPG|jpeg|png|gif|bmp)', str(p))]
-    file_list = glob.glob(os.path.abspath(input_pdf_dir) + "/**/*.*", recursive=True)
+    # file_list = [p for p in glob.glob(input_pdf_dir + "/**", recursive=True) if re.search('/*\.(jpg|JPG|jpeg|JPEG|png|gif|bmp)', str(p))]
+    file_list = [p for p in glob.glob(input_pdf_dir + "/**", recursive=True) if os.path.isfile(p)]
     for file_path in file_list:
         exchange_pdf_to_image(file_path)
 
