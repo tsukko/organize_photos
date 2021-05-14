@@ -2,7 +2,7 @@ import datetime
 import os
 import platform
 import ffmpeg as ffmpeg
-import win32com.client
+# import win32com.client
 from PIL import Image
 from PIL.ExifTags import TAGS
 
@@ -31,25 +31,25 @@ def get_date_from_metadata(file_path):
     return creation_time
 
 
-def get_date_from_win32com(file_path):
-    """
-    win32com.clientの機能により、ファイルのメタ情報から「メディアの作成日時」を取得する
-    GetDetailsOfの第二引数iColの値が変わる可能性があるため未使用
-
-    :param file_path: ファイル名（パス含む）
-    :return: 日付
-    """
-    folder_name, file_name = os.path.split(file_path)
-    sh = win32com.client.Dispatch('Shell.Application')
-    fol = sh.NameSpace(folder_name)
-    fol_item = fol.ParseName(file_name)
-    # for index in range(0, 210):
-    #     print("index: {0}, data: {1}".format(index, fol.GetDetailsOf(fol_item, index)))
-    creation_time = fol.GetDetailsOf(fol_item, 208)
-    # aaaa = datetime.datetime.strptime(creation_time, "%Y/%m/%d %H:%M").timestamp()
-    # ex. 2021/05/01 12:46
-    print("creation_time: ", creation_time)
-    return creation_time
+# def get_date_from_win32com(file_path):
+#     """
+#     win32com.clientの機能により、ファイルのメタ情報から「メディアの作成日時」を取得する
+#     GetDetailsOfの第二引数iColの値が変わる可能性があるため未使用
+#
+#     :param file_path: ファイル名（パス含む）
+#     :return: 日付
+#     """
+#     folder_name, file_name = os.path.split(file_path)
+#     sh = win32com.client.Dispatch('Shell.Application')
+#     fol = sh.NameSpace(folder_name)
+#     fol_item = fol.ParseName(file_name)
+#     # for index in range(0, 210):
+#     #     print("index: {0}, data: {1}".format(index, fol.GetDetailsOf(fol_item, index)))
+#     creation_time = fol.GetDetailsOf(fol_item, 208)
+#     # aaaa = datetime.datetime.strptime(creation_time, "%Y/%m/%d %H:%M").timestamp()
+#     # ex. 2021/05/01 12:46
+#     print("creation_time: ", creation_time)
+#     return creation_time
 
 
 def get_date_from_exif_of_image(file_path):

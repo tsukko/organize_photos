@@ -5,8 +5,8 @@ import shutil
 from date_operation import get_date
 
 # use Windows
-output_image_dir = "intermediate_img"
-input_pdf_dir = "input"
+output_image_dir = "/Volumes/Data2017121/Photo/all"
+input_pdf_dir = "/Users/tsukko/Documents/new/"
 
 
 def exchange_pdf_to_image(file_path):
@@ -34,16 +34,21 @@ def exchange_pdf_to_image(file_path):
     num = 0
     file_size = os.path.getsize(file_path)
     while os.path.exists(new_file_path) and os.path.getsize(new_file_path) != file_size:
-        print("debug: ", file_path)
-        print("debug: ", file_size, os.path.getsize(new_file_path))
+        # print("debug: ", file_path)
+        # print("debug: ", file_size, os.path.getsize(new_file_path))
         num += 1
         new_file_path = new_file_path_base + "_m" + str(num) + file_ext
 
-    response_path = new_file_path
-    # response_path = shutil.copyfile(file_path, new_file_path)
-    # response_path = shutil.move(file_path, new_file_path)
+    # if os.path.exists(new_file_path) and os.path.getsize(new_file_path) == file_size:
+    #     # print("debug: ", file_path)
+    #     print("debug: ", file_path, file_size, os.path.getsize(new_file_path))
+    #     return ""
 
-    # print("old: {0}, new: {1}".format(file_path, response_path))
+    # response_path = new_file_path
+    # response_path = shutil.copyfile(file_path, new_file_path)
+    response_path = shutil.move(file_path, new_file_path)
+
+    print("old: {0}, new: {1}".format(file_path, response_path))
     return response_path
 
 
