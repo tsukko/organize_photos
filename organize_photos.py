@@ -27,6 +27,9 @@ def exchange_pdf_to_image(file_path):
     # 保存ファイル名の設定
     new_file_name = file_date.strftime("%Y%m%d_%H%M%S")
     file_ext = os.path.splitext(file_path)[1]
+    if file_ext in (".jpeg", ".JPEG"):
+        file_ext = ".JPG"
+        # print("exchange: ", file_ext, file_path)
     new_file_path_base = save_path + "/IMG_" + new_file_name
     new_file_path = new_file_path_base + file_ext
 
@@ -56,6 +59,7 @@ def run():
     os.makedirs(output_image_dir, exist_ok=True)
     # file_list = [p for p in glob.glob(input_pdf_dir + "/**", recursive=True) if re.search('/*\.(jpg|JPG|jpeg|JPEG|png|gif|bmp)', str(p))]
     file_list = [p for p in glob.glob(input_pdf_dir + "/**", recursive=True) if os.path.isfile(p)]
+    print("file count: {0}".format(len(file_list)))
     for file_path in file_list:
         exchange_pdf_to_image(file_path)
 
