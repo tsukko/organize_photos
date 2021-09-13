@@ -7,6 +7,21 @@ from PIL import Image
 from PIL.ExifTags import TAGS
 
 
+def get_date_from_filename(file_path):
+    # IMG_20160413_110810.mp4
+    filename_date = None
+    try:
+        file_ext = os.path.splitext(os.path.basename(file_path))[0].replace("IMG_", "")
+        filename_date = datetime.datetime.strptime(file_ext, "%Y%m%d_%H%M%S")
+        print("filename_date: ", filename_date)
+        filename_date = filename_date.timestamp()
+    except Exception as e:
+        # print("get_date_from_filename. exception: {0}".format(e))
+        return None
+
+    return filename_date
+
+
 def get_date_from_metadata(file_path):
     """
     ffmpegの機能により、ファイルのメタ情報から「メディアの作成日時」を取得する
@@ -84,6 +99,8 @@ def get_date(file_path):
     :param file_path: ファイル名（パス含む）
     :return: 日付
     """
+    # file名の日時
+    filename_date = get_date_from_filename(file_path)
     # メタ情報「メディアの作成日時」
     creation_time = get_date_from_metadata(file_path)
     # EXIF「撮影日時」
@@ -101,6 +118,26 @@ def get_date(file_path):
     # 更新日時
     mt = os.path.getmtime(file_path)
 
-    min_date = datetime.datetime.fromtimestamp(min([item for item in [creation_time, exif_date, ct, mt] if item]))
-    print("min_date: ", min_date, "| creation_time: ", creation_time, "exif_date: ", exif_date, "ct: ", ct, "mt: ", mt)
+    min_date = datetime.datetime.fromtimestamp(min(
+        [item for item in [filename_date, creation_time, exif_date, ct, mt] if item]
+    ))
+    # print("min_date: ", min_date, "|",
+    #       "filename_date: ", filename_date,
+    #       "creation_time: ", creation_time,
+    #       "exif_date: ", exif_date,
+    #       "ct: ", ct,
+    #       "mt: ", mt)
+    print("min_date: ", min_date, "|",
+          "filename_date: ", print_date(filename_date),
+          "creation_time: ", print_date(creation_time),
+          "exif_date: ", print_date(exif_date),
+          "ct: ", print_date(ct),
+          "mt: ", print_date(mt))
     return min_date
+
+
+def print_date(date):
+    if date:
+        return datetime.datetime.fromtimestamp(date)
+    else:
+        return date

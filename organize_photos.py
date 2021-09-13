@@ -1,3 +1,4 @@
+import datetime
 import glob
 import os
 import shutil
@@ -5,11 +6,11 @@ import shutil
 from date_operation import get_date
 
 # use Windows
-output_image_dir = "/Volumes/Data2017121/Photo/all"
-input_pdf_dir = "/Users/tsukko/Documents/new/"
+input_pdf_dir = r"C:\00_work\lo\pic_20210910\pic"
+output_image_dir = r"C:\00_work\lo\ex\ma"
 
 
-def exchange_pdf_to_image(file_path):
+def exchange_image_file_name(file_path):
     """
     ファイル名の変更
 
@@ -19,6 +20,9 @@ def exchange_pdf_to_image(file_path):
     # ファイル名に設定する日時の取得
     file_date = get_date(file_path)
 
+    # もし、日付を強制的に指定したい場合、ここで指定する
+    # file_date = datetime.datetime.strptime("20161013_143349", "%Y%m%d_%H%M%S")
+
     # 保存用パスの設定とフォルダ生成
     file_directory = file_date.strftime("%Y%m")
     save_path = os.path.abspath(output_image_dir) + "/" + file_directory
@@ -26,8 +30,11 @@ def exchange_pdf_to_image(file_path):
 
     # 保存ファイル名の設定
     new_file_name = file_date.strftime("%Y%m%d_%H%M%S")
-    file_ext = os.path.splitext(file_path)[1]
     new_file_path_base = save_path + "/IMG_" + new_file_name
+    file_ext = os.path.splitext(file_path)[1]
+    if file_ext in (".jpeg", ".JPEG"):
+        file_ext = ".JPG"
+        # print("exchange: ", file_ext, file_path)
     new_file_path = new_file_path_base + file_ext
 
     # もし、同時刻のファイルが存在し、かつ、同じファイルサイズ出ない場合、ファイル名に"_m[enum]"を追加する
@@ -44,11 +51,15 @@ def exchange_pdf_to_image(file_path):
     #     print("debug: ", file_path, file_size, os.path.getsize(new_file_path))
     #     return ""
 
+    # debug用、コピー・ムーブなしで結果だけ出力する場合
     # response_path = new_file_path
-    # response_path = shutil.copyfile(file_path, new_file_path)
-    response_path = shutil.move(file_path, new_file_path)
+    # コピーするかムーブするか
+    response_path = shutil.copy2(file_path, new_file_path)
+    if file_ext != ".JPG":
+        os.utime(new_file_path, (file_date.timestamp(), file_date.timestamp()))
+    # response_path = shutil.move(file_path, new_file_path)
 
-    print("old: {0}, new: {1}".format(file_path, response_path))
+    # print("old: {0}, new: {1}".format(file_path, response_path))
     return response_path
 
 
@@ -57,7 +68,7 @@ def run():
     # file_list = [p for p in glob.glob(input_pdf_dir + "/**", recursive=True) if re.search('/*\.(jpg|JPG|jpeg|JPEG|png|gif|bmp)', str(p))]
     file_list = [p for p in glob.glob(input_pdf_dir + "/**", recursive=True) if os.path.isfile(p)]
     for file_path in file_list:
-        exchange_pdf_to_image(file_path)
+        exchange_image_file_name(file_path)
 
 
 if __name__ == '__main__':
