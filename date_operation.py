@@ -3,17 +3,18 @@ import os
 import platform
 import ffmpeg as ffmpeg
 # import win32com.client
-from PIL import Image
-from PIL.ExifTags import TAGS
+# from PIL import Image
+# from PIL.ExifTags import TAGS
+import exifread
 
 
 def get_date_from_filename(file_path):
     # 例：IMG_20160413_110810.mp4　→　20160413_110810
     filename_date = None
     try:
-        file_ext = os.path.splitext(os.path.basename(file_path))[0].replace("IMG_", "")
+        file_ext = os.path.splitext(os.path.basename(file_path))[0][4:19]
         filename_date = datetime.datetime.strptime(file_ext, "%Y%m%d_%H%M%S")
-        print("filename_date: ", filename_date)
+        # print("filename_date: ", filename_date)
         filename_date = filename_date.timestamp()
     except Exception as e:
         # print("get_date_from_filename. exception: {0}".format(e))
@@ -77,13 +78,20 @@ def get_date_from_exif_of_image(file_path):
     """
     exif_date = None
     try:
-        im = Image.open(file_path)
-        exif = im._getexif()
-        for tag_id, value in exif.items():
-            tag = TAGS.get(tag_id, tag_id)
-            if isinstance(tag, str) and "DateTimeOriginal" in tag:
-                exif_date = datetime.datetime.strptime(value, "%Y:%m:%d %H:%M:%S").timestamp()
-                break
+        with open(file_path, 'rb') as f:
+            tags = exifread.process_file(f, details=False)
+        if 'EXIF DateTimeOriginal' in tags.keys():
+            datetime_original = tags['EXIF DateTimeOriginal'].values
+            exif_date = datetime.datetime.strptime(datetime_original, "%Y:%m:%d %H:%M:%S").timestamp()
+            return exif_date
+
+        # im = Image.open(file_path)
+        # exif = im._getexif()
+        # for tag_id, value in exif.items():
+        #     tag = TAGS.get(tag_id, tag_id)
+        #     if isinstance(tag, str) and "DateTimeOriginal" in tag:
+        #         exif_date = datetime.datetime.strptime(value, "%Y:%m:%d %H:%M:%S").timestamp()
+        #         break
     except Exception as e:
         # print("no exif_date. exception: {0}".format(e))
         return None
@@ -133,6 +141,9 @@ def get_date(file_path):
           "exif_date: ", print_date(exif_date),
           "ct: ", print_date(ct),
           "mt: ", print_date(mt))
+
+    # もし、日付を強制的に指定したい場合、ここで指定する
+    # min_date = datetime.datetime.strptime("20030801_025102", "%Y%m%d_%H%M%S")
     return min_date
 
 

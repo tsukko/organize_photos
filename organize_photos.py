@@ -2,11 +2,13 @@ import glob
 import os
 import shutil
 
+import win32_setctime
+
 from date_operation import get_date
 
 # use Windows
-input_pdf_dir = r"C:\00_work\lo\pic_20210910\pic"
-output_image_dir = r"C:\00_work\lo\ex\ma"
+input_pdf_dir = r"C:\00_work\lo\pic_20210910\tt"
+output_image_dir = r"C:\00_work\lo\pic_20210910\res"
 
 
 def exchange_image_file_name(file_path):
@@ -18,9 +20,6 @@ def exchange_image_file_name(file_path):
     """
     # ファイル名に設定する日時の取得
     file_date = get_date(file_path)
-
-    # もし、日付を強制的に指定したい場合、ここで指定する
-    # file_date = datetime.datetime.strptime("20161013_143349", "%Y%m%d_%H%M%S")
 
     # 保存用パスの設定とフォルダ生成
     file_directory = file_date.strftime("%Y%m")
@@ -52,13 +51,21 @@ def exchange_image_file_name(file_path):
 
     # debug用、コピー・ムーブなしで結果だけ出力する場合
     # response_path = new_file_path
+
     # コピーする場合
     response_path = shutil.copy2(file_path, new_file_path)
+
     # 動画系について、昔、copy2ではなくcopyでコピーしていた時、更新日時などすべて最新日付になってしまっているので、修正するコードを実装している
-    if file_ext != ".JPG":
-        os.utime(new_file_path, (file_date.timestamp(), file_date.timestamp()))
+    # if file_ext != ".JPG":
+    # os.utime(new_file_path, (file_date.timestamp(), file_date.timestamp()))
+
     # move系は考慮できていない
     # response_path = shutil.move(file_path, new_file_path)
+
+    # ファイル作成日時、アクセス日時、更新日時の変更
+    # 作成日時はWindowsのみ対象のため注意
+    win32_setctime.setctime(new_file_path, file_date.timestamp())
+    os.utime(new_file_path, (file_date.timestamp(), file_date.timestamp()))
 
     # print("old: {0}, new: {1}".format(file_path, response_path))
     return response_path
